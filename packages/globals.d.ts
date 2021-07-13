@@ -6,4 +6,4 @@ type Nullable<T> = T | null
 
 type TrackInfo = Indexable<string | number>
 
-type TimeoutHandle = ReturnType<typeof global.setTimeout>
+type TimeoutId = ReturnType<typeof global.setTimeout>

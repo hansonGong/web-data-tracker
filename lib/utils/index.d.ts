@@ -12,7 +12,7 @@ declare function write2Storage(defaultKey: string, trackInfo: TrackInfo): void;
  * @param baseKey 基础埋点信息对象或者对象里面的key
  * @param value 当key为key时对应的value
  */
-declare function setTrackBaseInfo(baseKey: any, value?: any): void;
+declare function setTrackBaseInfo(baseKey: unknown, value?: unknown): void;
 /**
  * 特殊情况手动埋点
  * @param options 回调函数
@@ -24,7 +24,5 @@ declare function manualBurying(options: TrackInfo, trackKey?: string): void;
  * @param fn 回调函数
  * @param delay 时间间隔延迟多少毫秒
  */
-declare function throttle(fn: {
-    apply: (arg0: any, arg1: any[]) => void;
-}, delay?: number, immediate?: boolean): () => void;
+declare function throttle<C, T extends unknown[]>(fn: (this: C, ...args: T) => void, delay?: number, immediate?: boolean): (this: C, ...args: T) => void;
 export { write2Storage, clearStorage, getBaseInfo, getTemplateInfo, manualBurying, throttle, setTrackBaseInfo, DEDAULT_KEY, };

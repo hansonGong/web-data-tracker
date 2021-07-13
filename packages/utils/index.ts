@@ -15,7 +15,7 @@ function generateUUID(): string {
 // 返回埋点基础信息
 function getBaseInfo(): TrackInfo {
   const { width, height } = window.screen
-  const baseInfo = LocalStorage.get(BASE_KEY)
+  const baseInfo = LocalStorage.get(BASE_KEY) || {}
   const defaultInfo = {
     deviceId: generateUUID(),
     deviceBrand: getBrowserInfo(),
@@ -67,7 +67,7 @@ function write2Storage(defaultKey: string, trackInfo: TrackInfo): void {
  * @param baseKey 基础埋点信息对象或者对象里面的key
  * @param value 当key为key时对应的value
  */
-function setTrackBaseInfo(baseKey: any, value?: any) {
+function setTrackBaseInfo(baseKey: unknown, value?: unknown): void {
   if (!baseKey) console.warn('缺少埋点基础信息')
   if (typeof baseKey !== 'string') {
     LocalStorage.set(BASE_KEY, value)
@@ -94,29 +94,26 @@ function manualBurying(options: TrackInfo, trackKey?: string): void {
  * @param fn 回调函数
  * @param delay 时间间隔延迟多少毫秒
  */
-function throttle(
-  fn: { apply: (arg0: any, arg1: any[]) => void },
+function throttle<C, T extends unknown[]>(
+  fn: (this: C, ...args: T) => void,
   delay = 200,
   immediate = false,
-): () => void {
-  let timer: Nullable<TimeoutHandle> = null,
+): (this: C, ...args: T) => void {
+  let timer: Nullable<TimeoutId> = null,
     remaining = 0,
     previous = Date.now()
-  return function (this: any, ...args) {
-    const now = Date.now(),
-      context = this
+  return function (...args: T) {
+    const now = Date.now()
     remaining = now - previous
     if (remaining >= delay || immediate) {
-      if (timer) {
-        clearTimeout(timer)
-      }
-      fn.apply(context, args)
+      if (timer) clearTimeout(timer)
+      fn.call(this, ...args)
       previous = now
       immediate = false
     } else {
       if (timer) return
       timer = setTimeout(() => {
-        fn.apply(context, args)
+        fn.call(this, ...args)
         previous = Date.now()
       }, delay - remaining)
     }

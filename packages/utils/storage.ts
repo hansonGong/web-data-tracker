@@ -1,10 +1,10 @@
 export class LocalStorage {
-  static set(sName: string, value: any): void {
+  static set(sName: string, value: unknown): void {
     if (!sName) return
     if (typeof value !== 'string') {
       value = JSON.stringify(value)
     }
-    window.localStorage.setItem(sName, value)
+    window.localStorage.setItem(sName, value as string)
   }
   static get(sName: string): any {
     let info = window.localStorage.getItem(sName) || ''

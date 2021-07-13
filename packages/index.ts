@@ -11,6 +11,9 @@ import {
 } from './utils'
 import { LocalStorage } from './utils/storage'
 
+// 下面的any主要是不想定义了
+type anyMap = Indexable<any>
+
 interface DirectiveBinding {
   name: string
   value?: any
@@ -19,23 +22,24 @@ interface DirectiveBinding {
   modifiers?: Indexable<boolean>
 }
 
-type Fn<V> = (...arg: any[]) => V
+type Fn<V> = (...arg: unknown[]) => V
+type listener = (e: Event) => void
 
 class TrackPoint {
   defaultKey: string
   intervalTime: number
-  eventMap: Indexable<any>
+  eventMap: anyMap
   getTrackConfig: Fn<Indexable<string>>
   getUploadId: Fn<Indexable<string>>
   uploadTracks: Fn<void>
   customActionFn: Indexable<Fn<void>>
-  trackList: Indexable<any>[]
+  trackList: anyMap[]
   baseInfo: TrackInfo
   userScrollDepth: number
   promiseQueue: Array<() => void>
-  scrollCallback: any
+  scrollCallback: Nullable<listener>
 
-  constructor(options = {} as Indexable<any>) {
+  constructor(options = {} as anyMap) {
     this.defaultKey = `${options.appId}_track`
     this.intervalTime = options.time || 60 * 1000
     this.getTrackConfig = options.getTrackConfig
@@ -53,24 +57,29 @@ class TrackPoint {
     setTrackBaseInfo('appId', options.appId)
   }
 
-  init() {
+  /**
+   * 埋点轮训上传
+   * @param immediate 是否立即上传历史埋点数据
+   */
+  init(immediate?: boolean) {
     // setInterval会把this指向window
     const fn = this.getPermission.bind(this)
     setInterval(fn, this.intervalTime)
+    if (immediate) fn()
   }
 
   // 缓存每一个绑定指令的Promise队列，队列为空则请求埋点配置接口
-  getEventMapQueue() {
-    return new Promise<void>((resolve) => {
+  getanyMapQueue(): Promise<void> {
+    return new Promise((resolve) => {
       if (this.promiseQueue.length === 0) {
-        this.getEventMap()
+        this.getanyMap()
       }
       this.promiseQueue.push(resolve)
     })
   }
 
   // 请求埋点配置接口，请求成功执行所有缓存队列
-  async getEventMap() {
+  async getanyMap() {
     const resp = await this.getTrackConfig()
     this.eventMap = resp
     this.promiseQueue.forEach((resolve) => {
@@ -123,8 +132,9 @@ class TrackPoint {
     binding: DirectiveBinding,
   ): Promise<void> {
     if (!binding.value) return
+    // 没有获取到埋点配置内容需进入队列等待
     if (Object.keys(this.eventMap).length === 0) {
-      await this.getEventMapQueue()
+      await this.getanyMapQueue()
     }
     const { id } = binding.value
     const { action } = this.eventMap[id] || {}
@@ -156,7 +166,7 @@ class TrackPoint {
     const clickFn = () => {
       write2Storage(this.defaultKey, trackInfo)
     }
-    el.addEventListener(action, throttle(clickFn, 100), false)
+    el.addEventListener(action, throttle(clickFn, 300), false)
   }
 
   // 添加页面停留监听
@@ -209,7 +219,7 @@ class TrackPoint {
       write2Storage(this.defaultKey, trackInfo)
     } else {
       this.saveScrollTrack(trackInfo)
-      window.removeEventListener('scroll', this.scrollCallback)
+      window.removeEventListener('scroll', this.scrollCallback as listener)
     }
   }
 }

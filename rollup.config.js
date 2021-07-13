@@ -4,7 +4,7 @@ import commonjs from 'rollup-plugin-commonjs' // commonjs模块转换插件
 import babel from 'rollup-plugin-babel'
 import { eslint } from 'rollup-plugin-eslint' // eslint插件
 import ts from 'rollup-plugin-typescript2'
-// import { terser } from "rollup-plugin-terser"
+import { terser } from "rollup-plugin-terser"
 const getPath = _path => path.resolve(__dirname, _path)
 import packageJSON from './package.json'
 
@@ -37,7 +37,7 @@ const commonConf = {
     commonjs(),
     esPlugin,
     tsPlugin,
-    // terser()
+    terser()
   ]
 }
 // 需要导出的模块类型
