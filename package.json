@@ -1,8 +1,8 @@
 {
-  "name": "vue-track",
+  "name": "vue-trackjs",
   "version": "1.0.0",
-  "description": "A front-end lightweight caching library",
-  "main": "lib/index.min.js",
+  "description": "A lightweight tracking library of vue.",
+  "main": "lib/track.min.js",
   "repository": "https://github.com/hansonGong/vue-trackjs.git",
   "types": "lib/index.d.ts",
   "files": [

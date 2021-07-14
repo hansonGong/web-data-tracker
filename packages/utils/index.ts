@@ -80,13 +80,13 @@ function setTrackBaseInfo(baseKey: unknown, value?: unknown): void {
 
 /**
  * 特殊情况手动埋点
- * @param options 回调函数
+ * @param trackInfo 回调函数
  * @param trackKey 时间间隔延迟多少毫秒
  */
-function manualBurying(options: TrackInfo, trackKey?: string): void {
+function manualBurying(trackInfo: TrackInfo, trackKey?: string): void {
   const defaultKey = trackKey || LocalStorage.get(DEDAULT_KEY)
-  const trackInfo = Object.assign({}, getTemplateInfo(), options)
-  write2Storage(defaultKey, trackInfo)
+  const info = Object.assign({}, getTemplateInfo(), trackInfo)
+  write2Storage(defaultKey, info)
 }
 
 /**

@@ -15,10 +15,10 @@ declare function write2Storage(defaultKey: string, trackInfo: TrackInfo): void;
 declare function setTrackBaseInfo(baseKey: unknown, value?: unknown): void;
 /**
  * 特殊情况手动埋点
- * @param options 回调函数
+ * @param trackInfo 回调函数
  * @param trackKey 时间间隔延迟多少毫秒
  */
-declare function manualBurying(options: TrackInfo, trackKey?: string): void;
+declare function manualBurying(trackInfo: TrackInfo, trackKey?: string): void;
 /**
  * 节流
  * @param fn 回调函数
